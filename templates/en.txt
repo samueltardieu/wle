@@ -1,0 +1,10 @@
+To confirm that the message you sent and quoted below is not a spam,
+please answer this mail keeping the subject line intact (like almost
+any mail client) or send the following line alone:
+
+  confirm #%(key)s
+
+Once you have done that, your address will be added to my whitelist
+and you will not have to repeat this process again.
+
+More info? Look at: http://www.rfc1149.net/wle

@@ -1,0 +1,6 @@
+--- This is an automatic message
+
+I am not available at this time and shall return soon. I will not be
+able to read your mail "%(subject)s" before I return.
+
+  %(my_name)s

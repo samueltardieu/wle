@@ -1,0 +1,208 @@
+[DEFAULT]
+
+#
+# Default values are commented
+#
+
+#
+# WLE configuration directory
+#
+#wledir = (your home directory)/.wle
+
+#
+# Ignore list (people we don't want to receive mail from)
+#
+#ignorelist = %(wledir)s/ignorelist.txt
+
+#
+# Confirmed list (people we accept mail from)
+#
+#confirmedlist = %(wledir)s/authorizedlist.txt
+
+#
+# Directory for waiting mail
+#
+#queuedir = %(wledir)s/queue
+
+#
+# Lock file (use a local file, no NFS mounted directory)
+#
+#lockfile = %(wledir)s/lock
+
+#
+# List of languages to use in confirmation requests
+#
+# Example: languages = en, fr
+#
+#languages = en
+
+#
+# Templates directory for confirmation messages
+#
+#templatesdir = %(wledir)s/templates
+
+#
+# List of regular expressions matching the owner address. The first one is
+# used by default, and must be a real address.
+#
+# Example: myaddress = sam@rfc1149.net, (root|postmaster)@rfc1149.net
+#
+#myaddresses = (no default)
+
+#
+# Full name of the owner
+#
+# Example: myname = Samuel Tardieu
+#
+#myname = (no default)
+
+
+#
+# Charset to use in confirmation messages
+#
+#charset = iso-8859-1
+
+
+#
+# Path to the sendmail program
+#
+#sendmail = /usr/sbin/sendmail
+
+#
+# Secret string, that is used to compute the MD5 password
+#
+#secret = This is not so secret (change it!)
+
+#
+# Magic string, added in delivered mail
+#
+#magic = Some magic string (change it!)
+
+#
+# Mailbox in which ok mail will be delivered
+#
+# Example: mailbox = | /usr/local/bin/procmail /home/sam/.procmailrc.ok
+#
+#mailbox = /var/mail/YOUR LOGIN
+
+#
+# Mailbox in which junk mail will be delivered
+#
+# Example: junkbox = /home/sam/Junk
+#
+#junkbox = YOUR HOME DIR/Junk
+
+#
+# Mailbox in which bulk mail will be delivered
+#
+# Example: bulkbox = /home/sam/Bulk
+#
+#bulkbox = YOUR HOME DIR/Bulk
+
+#
+# Mailbox in which confirmation mail will be delivered
+#
+# Example: confirmedbox = /home/sam/Confirmed
+
+#
+# Do private people automatically add related senders?
+#
+#people_add_other = no
+
+#
+# Do private people add other people in the discussion?
+#
+#discuss_add_other = yes
+
+#
+# Do mailing-lists participants get automatically added?
+#
+#list_add_other = no
+
+#
+# If a different address is used to answer the confirmation request, add
+# this address as well?
+#
+#allow_confirmer = yes
+
+#
+# Do the recipients of my own mails get added to the authorization list?
+#
+#confirm_recipients = yes
+
+#
+# Add a maximum of addresses (From, Reply-To, Sender, ...) for each
+# added person?
+#
+#max_confirm = yes
+
+#
+# Logfile
+#
+#logfile = %(wledir)s/log
+
+#
+# Log level (0 is none, 1 is errors, 9 is everything)
+#
+#loglevel = 9
+
+#
+# Days before a confirmation request is removed
+#
+#remove_days = 10
+
+#
+# Auto-delete queued message if the confirmation bounces?
+#
+#auto_delete_bounce = yes
+
+#
+# Add sender when the magic string is part of the mail (quotes signature
+# typically)
+#
+#magic_add_sender = yes
+
+#
+# Directory for storing databases
+#
+#dbdir = %(wledir)s/dbs
+
+#
+# Database for old requests
+#
+#old_requests = %(dbdir)s/old_requests
+
+#
+# Database for keeping track of confirmations (to avoid multiple confirmations)
+#
+#confirmations = %(dbdir)s/confirmations
+
+#
+# Minimum delay in hours between confirmation requests
+#
+#minimum_delay_hours = 6
+
+#
+# Days before database cleanup
+#
+#cleanup_days = 10
+
+#
+# Send a "vacation" message
+#
+#vacation = no
+
+#
+# Template for the vacation message
+#
+#vacation_msg = %(templatesdir)s/vacation.txt
+
+#
+# Days between vacation notices
+#
+#vacation_days = 14
+
+#
+# Vacation database
+#
+#vacation_db = %(dbdir)s/vacation

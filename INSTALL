@@ -1,0 +1,10 @@
+Tiny installation guide:
+
+  - copy all .py files in a directory (for example, ~/Dev/WLE)
+  - copy then edit sample.wlerc into ~/.wlerc
+  - create directories referenced in ~/.wlerc, such as:
+       ~/.wle ~/.wle/queue ~/.wle/dbs ~/.wle/templates
+  - copy then edit templates/* into ~/.wle/templates
+  - call wle.py from your .forward of your .procmailrc (see sample.procmailrc)
+
+Report bugs and wishes to sam@rfc1149.net.

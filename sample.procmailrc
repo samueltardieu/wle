@@ -1,0 +1,17 @@
+#
+# Sample .procmailrc (with mailbox being procmail ~/.procmailrc.deliver)
+#
+
+# Filter mail through WLE
+:0c
+* !^X-WLE-Magic: <SOME MAGIC STRING>
+| /usr/bin/python /home/sam/Dev/WLE/wle.py
+
+# If exit code is not zero, indicate it
+:0e
+| /usr/bin/formail -I 'X-WLE-Action: exception in WLE' \
+| /usr/bin/procmail /home/sam/.procmailrc.deliver
+
+# Otherwise, mail has been taken care of
+:0
+/dev/null

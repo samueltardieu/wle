@@ -1,0 +1,11 @@
+Merci de confirmer que le message que vous avez envoyé n'est pas un
+courrier publicitaire non sollicité en répondant à ce courrier en
+conservant son sujet (ce que font quasiment tous les logiciels de
+messagerie), ou en envoyant la ligne ci-dessous seule:
+
+  confirm #%(key)s
+
+Lorsque vous aurez fait cela, votre adresse sera automatiquement ajoutée
+à ma liste d'autorisation, et vous n'aurez pas à répéter ce processus.
+
+Plus d'infos? Allez voir: http://www.rfc1149.net/wle
