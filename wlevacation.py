@@ -5,14 +5,8 @@
 #
 
 from email.MIMEText import MIMEText
-import email.Utils, shelve, time
-import wleconfig, wleconfirm, wlelog, wlemail
-
-#
-# Open vacation database
-#
-def vacation_db ():
-    return shelve.open (wleconfig.config.get ('DEFAULT', 'vacation_db'))
+import email.Utils, time
+import wleconfig, wleconfirm, wledb, wlelog, wlemail
 
 #
 # Check whether we can send a vacation message, update the database and
@@ -20,16 +14,19 @@ def vacation_db ():
 #
 
 def vacation_message (m):
-    db = vacation_db ()
+    db = wledb.connect_db ()
     recipient = wlemail.senders(m)[0]
     recipient_email = recipient[1]
     target = email.Utils.formataddr (recipient)
-    if db.has_key (recipient_email) and \
-       time.time () - db[recipient_email] < \
+    c = db.cursor ()
+    c.execute ("select stamp from vacation where email='%s'" % recipient_email)
+    if c.rowcount > 0 and time.time () - float(c.fetchone()[0]) < \
        86400 * wleconfig.config.getint ('DEFAULT', 'vacation_days'):
         wlelog.log (8, "Not sending duplicate vacation message to %s" % target)
         return None
-    db[recipient_email] = time.time ()
+    c.execute ("insert into vacation values ('%s', %f)" %
+               (recipient_email, time.time ()))
+    db.commit ()
     my_name = wleconfig.config.get ('DEFAULT', 'myname')
     my_addr = wleconfirm.confirmation_sender (m)
     subject = m['subject'] or "..."

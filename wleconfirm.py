@@ -4,11 +4,21 @@
 # Confirmation handling
 #
 
-import wlelog, wlequeue, wleconfig, wlemail, wlevacation
-import email.Header, email.Parser, md5, re, os.path, shelve, string, time
+import wledb, wlelog, wlequeue, wleconfig, wlemail, wlevacation, wlelists
+from wlestats import count_delivered
+import email.Header, email.Parser, md5, re, os.path, string, time
 from email.MIMEMessage import MIMEMessage
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
+
+#
+# Check whether an unblocked mail needs to unblock othe rpeople
+#
+
+def check_discuss (m):
+    if wleconfig.config.getboolean ('DEFAULT', 'discuss_add_other'):
+        if wlemail.sent_to_me (m):
+            wlelists.add_confirmed (m.mrecipients)
 
 #
 # My own addresses
@@ -40,10 +50,12 @@ def confirmation_sender (m):
     else: return myself()[0]
 
 def can_send_confirmation (recipient):
-    db = confirmations_db ()
-    if not db.has_key (recipient): return True
+    db = wledb.connect_db ()
+    c = db.cursor ()
+    c.execute ("select stamp from confirmations where email='%s' " % recipient)
+    if c.rowcount == 0: return True
     mdh = wleconfig.config.getfloat ('DEFAULT', 'minimum_delay_hours')
-    return (time.time() - db[recipient]) / 3600 >= mdh
+    return (time.time () - float (c.fetchone()[0])) / 3600 >= mdh
 
 #
 # Cleanup dbs
@@ -52,11 +64,11 @@ def can_send_confirmation (recipient):
 def cleanup_dbs ():
     min = time.time () - \
           86400 * wleconfig.config.getfloat ('DEFAULT', 'cleanup_days')
-    for db in [old_requests_db(), confirmations_db()]:
-        for k in db.keys():
-            if db[k] < min:
-                wlelog.log (7, "Cleaning up record %s" % k)
-                del db[k]
+    db = wledb.connect_db ()
+    c = db.cursor ()
+    c.execute ("delete from confirmations where stamp < %f" % min)
+    c.execute ("delete from old_requests where stamp < %f" % min)
+    db.commit ()
 
 #
 # Make excuse message
@@ -106,7 +118,11 @@ def confirmation (m, key):
     origin = MIMEMessage (m)
     origin['Content-Disposition'] = 'attachment'
     r.attach (origin)
-    confirmations_db()[recipient_email] = time.time()
+    db = wledb.connect_db ()
+    c = db.cursor ()
+    c.execute ("insert into confirmations values ('%s', %f)" %
+               (recipient_email, time.time ()))
+    db.commit ()
     return r
 
 #
@@ -157,15 +173,11 @@ def is_confirm (m):
         if x: return is_key (x.group (1))
     return False
 
-def old_requests_db ():
-    return shelve.open (wleconfig.config.get ('DEFAULT', 'old_requests'))
-
-def confirmations_db ():
-    return shelve.open (wleconfig.config.get ('DEFAULT', 'confirmations'))
-
 def is_old_confirm (m):
     x = _confirm_re.search (m.as_string())
-    if x: return old_requests_db().has_key(x.group(1))
+    if x:
+        return wledb.check_presence ("old_requests", "request",
+                                     x.group (1))
     return False
 
 #
@@ -201,7 +213,11 @@ def open_by_key (key):
 def remove_message (key):
     wlelog.log (5, "Removing queue file %s" % key)
     os.unlink (queue_path (key))
-    old_requests_db()[key] = time.time ()
+    db = wledb.connect_db ()
+    c = db.cursor ()
+    c.execute ("insert into old_requests values ('%s', %f)" %
+               (key, time.time()))
+    db.commit ()
 
 #
 # Move message in mailbox and remove from queue. Add an action field and
@@ -223,6 +239,7 @@ def move_message_from_queue (key, mailbox, action, magic = False):
 #
 
 def deliver (key):
+    count_delivered ()
     wlelog.log (3, 'Unblocking mail with key %s' % key)
     return move_message_from_queue (key, 'mailbox',
                                     'Confirmed (%s)' % \
@@ -237,4 +254,6 @@ def also_unblock (s):
     for k in wlequeue.waitinglist():
         try: m = open_by_key (k)
         except: continue
-        if s in m.msenders: deliver (k)
+        if s in m.msenders:
+		deliver (k)
+		check_discuss (m)

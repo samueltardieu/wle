@@ -5,6 +5,7 @@
 #
 
 import wleconfig, wleconfirm, wlemail, wlelog, wlelists
+from wlestats import count_junk
 import dircache, email.Utils, os, re, stat, string, time
 from email.MIMEText import MIMEText
 
@@ -125,4 +126,5 @@ def handle_action (action, key):
     elif action == 'D':
         wleconfirm.deliver (key)
     elif action == 'R':
-        wleconfirm.remove_message (key)
+        wleconfirm.move_message_from_queue (key, 'junkbox', 'Removed or expired')
+	count_junk ()

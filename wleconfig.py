@@ -39,12 +39,23 @@ _default_config = \
      'dbdir':               '%(wledir)s/dbs',
      'old_requests':        '%(dbdir)s/old_requests',
      'confirmations':       '%(dbdir)s/confirmations',
+     'confirmeddb':         '%(dbdir)s/authorized.sqlite',
+     'dbname':              '%(wledir)s/wle.sqlite',
      'minimum_delay_hours': '6',
      'cleanup_days':        '10',
      'vacation':            'no',
      'vacation_msg':        '%(templatesdir)s/vacation.txt',
      'vacation_days':       '14',
-     'vacation_db':         '%(dbdir)s/vacation'
+     'vacation_db':         '%(dbdir)s/vacation',
+     'statsdir':            '%(wledir)s/stats',
+     'stats_received':      'no',
+     'stats_confirmed':     'no',
+     'stats_rejected':      'no',
+     'stats_junk':          'no',
+     'stats_bulk':          'no',
+     'stats_authorized':    'no',
+     'stats_delivered':     'no',
+     'stats_queued':        'no'
    }
 
 def read_config ():

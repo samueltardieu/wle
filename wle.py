@@ -10,17 +10,14 @@ sys.path.append (INSTALLDIR)
 
 import email.Parser
 import wleconfirm, wlemail, wlelists, wlelog, wlelock, wleconfig, wlevacation
-
-def check_discuss (m):
-    if wleconfig.config.getboolean ('DEFAULT', 'discuss_add_other'):
-        if wlemail.sent_to_me (m):
-            wlelists.add_confirmed (m.mrecipients)
+from wlestats import count_received, count_confirmed, count_rejected, \
+     count_bulk, count_junk, count_queued, count_delivered
 
 def handle_confirmation (m, key):
     wlelog.log (3, 'Confirmation found with key %s' % key)
     unqueued = wleconfirm.deliver (key)
     wlelists.snoop_addresses (unqueued)
-    check_discuss (unqueued)
+    wleconfirm.check_discuss (unqueued)
     if wleconfig.config.getboolean ('DEFAULT', 'allow_confirmer'):
         wlelists.snoop_addresses (m)
     wleconfirm.deliver_mail (m, 'confirmedbox')
@@ -29,7 +26,8 @@ def handle_ok (m):
     wlemail.add_magic (m)
     wlevacation.handle_incoming (m)
     wleconfirm.deliver_mail (m, 'mailbox')
-    check_discuss (m)
+    count_delivered ()
+    wleconfirm.check_discuss (m)
     if wlemail.from_mailinglist (m):
         if wleconfig.config.getboolean ('DEFAULT', 'list_add_other'):
             wlelists.snoop_addresses (m)
@@ -46,6 +44,7 @@ def log_summary (m):
             wlelog.log (5, '%s: %s' % (i, m[i]))
 
 def logic (m):
+    count_received ()
     wlemail.parse_message (m)
     log_summary (m)
     if wleconfirm.is_old_confirm (m):
@@ -56,11 +55,14 @@ def logic (m):
         key = wleconfirm.is_confirm (m)
         if key:
             wlemail.add_action (m, 'Bounce of confirmation request')
+            count_junk ()
             wleconfirm.deliver_mail (m, 'junkbox')
             if wleconfig.config.getboolean ('DEFAULT', 'auto_delete_bounce'):
+                count_rejected ()
                 wleconfirm.move_message_from_queue (key,
                                                     'junkbox',
                                                     'Confirmation bounced')
+                wleconfirm.deliver_mail (m, 'junkbox')
             return
 	if wlemail.sent_to_me (m):
 	    wlemail.add_action (m, 'Mailer daemon get through')
@@ -74,6 +76,7 @@ def logic (m):
     key = wleconfirm.is_confirm (m)
     if key:
         if not wlemail.is_junk (m):
+            count_confirmed ()
             wlelog.log (3, 'Found key in mail')
             handle_confirmation (m, key)
             return
@@ -82,6 +85,7 @@ def logic (m):
     if x:
         wlemail.add_action (m, 'Ignore list (%s), junk box' % x)
         wleconfirm.deliver_mail (m, 'junkbox')
+        count_junk ()
         return
     x = wlemail.contains_command (m)
     if x:
@@ -98,21 +102,24 @@ def logic (m):
         wlemail.add_action (m, 'White list (%s)' % x)
         handle_ok (m)
         return
-    if wlelists.is_in_simple_list (m.msenders, 'confirmedlist'):
+    if wlelists.is_in_confirmed_list (m.msenders):
         wlemail.add_action (m, 'Sender found in authorized list')
         handle_ok (m)
         return
     if wlemail.from_mailinglist (m):
         wlemail.add_action (m, 'Bulk mail')
         wleconfirm.deliver_mail (m, 'bulkbox')
+        count_bulk ()
         return
     if wlemail.is_junk (m):
         wlemail.add_action (m, 'Junk mail')
         wleconfirm.deliver_mail (m, 'junkbox')
+        count_junk ()
         return
     # A new confirmation request is a good time to cleanup databases
     wleconfirm.cleanup_dbs ()
     wleconfirm.queue (m)
+    count_queued ()
     return
 
 try:

@@ -15,7 +15,7 @@
 #ignorelist = %(wledir)s/ignorelist.txt
 
 #
-# Confirmed list (people we accept mail from)
+# Confirmed list (people we accept mail from) (obsolete)
 #
 #confirmedlist = %(wledir)s/authorizedlist.txt
 
@@ -163,17 +163,28 @@
 #magic_add_sender = yes
 
 #
-# Directory for storing databases
+# Database
+#
+#dname = %(wledir)s/wle.sqlite
+
+#
+# Directory for storing databases (obsolete)
 #
 #dbdir = %(wledir)s/dbs
 
 #
-# Database for old requests
+# Confirmeddb (people we accept mail from) (obsolete)
+#
+#confirmeddb = %(dbdir)s/authorized.sqlite
+
+#
+# Database for old requests (obsolete)
 #
 #old_requests = %(dbdir)s/old_requests
 
 #
 # Database for keeping track of confirmations (to avoid multiple confirmations)
+# (obsolete)
 #
 #confirmations = %(dbdir)s/confirmations
 
@@ -206,3 +217,19 @@
 # Vacation database
 #
 #vacation_db = %(dbdir)s/vacation
+
+#
+# Statistics directory
+#
+#statsdir = %(wledir)s/stats
+
+#
+# Enable various statistics (statsdir must exist)
+#
+# stats_received = no
+# stats_confirmed = no
+# stats_rejected = no
+# stats_junk = no
+# stats_bulk = no
+# stats_authorized = no
+# stats_delivered = no

@@ -4,20 +4,19 @@
 # Lists handling
 #
 
-import email.Message, re, wleconfig, wleconfirm, wlemail, wlelog
+import email.Message, os, re, time
+import wleconfig, wleconfirm, wledb, wlemail, wlelog
+from wlestats import count_authorized
 
 #
-# Check if a string (email address) is in a simple list (no regexp, no prefix)
+# Check if one of the strings (email address) is in the confirmed list
+# (no regexp, no prefix)
 #
 
-def is_in_simple_list (str, list):
-    try:
-        l = open (wleconfig.config.get ('DEFAULT', list), 'r')
-    except:
-        return False
-    lines = map (lambda x: x[:-1], l.readlines())
+def is_in_confirmed_list (str, c = None):
     for i in str:
-        if i.lower() in lines: return True
+        if wledb.check_presence ("confirmed", "email", i.lower(), c):
+            return True
     return False
 
 #
@@ -75,6 +74,8 @@ def is_in_list (m, list):
 _well_formed_re = re.compile ('\S+@\S+\.\S+$')
 
 def add_confirmed (l):
+    db = wledb.connect_db ()
+    c = db.cursor ()
     for i in l:
         if not _well_formed_re.match (i): continue
         m = email.Message.Message ()
@@ -82,12 +83,13 @@ def add_confirmed (l):
         wlemail.parse_message (m)
         if is_in_list (m, 'whitelist'): continue
         if wleconfirm.is_mine ([i]): continue
-        if not is_in_simple_list ([i], 'confirmedlist'):
+        if not is_in_confirmed_list ([i], c):
             wlelog.log (2, 'Adding %s as authorized address' % i)
-            fd = open (wleconfig.config.get ('DEFAULT', 'confirmedlist'), 'a')
-            fd.write (i.lower() + '\n')
-            fd.close ()
-            wleconfirm.also_unblock (i)
+            c.execute ("insert into confirmed values ('%s', %f)" %
+                       (i.lower(), time.time ()))
+            count_authorized ()
+            wleconfirm.also_unblock (i)            
+    db.commit ()
 
 #
 # Snoop addresses in messages

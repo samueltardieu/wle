@@ -7,4 +7,11 @@ Tiny installation guide:
   - copy then edit templates/* into ~/.wle/templates
   - call wle.py from your .forward of your .procmailrc (see sample.procmailrc)
 
+You need to have the Python SQLite interface installed.
+
+If you are upgrading from a new version of WLE, please add new
+configuration variables into your configuration file. Once WLE has run
+for a few days, you can remove the variables marked as obsolete. WLE
+will take care of migrating your old data into the new SQLite format.
+
 Report bugs and wishes to sam@rfc1149.net.
