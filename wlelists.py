@@ -68,7 +68,7 @@ def is_in_list (m, list):
 
 #
 # Add a list of addresses to the confirmed list if they are not there
-# already there or in the whitelist
+# already there or in the whitelist (if confirm_whitelist=no)
 #
 
 _well_formed_re = re.compile ('\S+@\S+\.\S+$')
@@ -76,12 +76,13 @@ _well_formed_re = re.compile ('\S+@\S+\.\S+$')
 def add_confirmed (l):
     db = wledb.connect_db ()
     c = db.cursor ()
+    wl = wleconfig.config.getboolean ('DEFAULT', 'confirm_whitelist')
     for i in l:
         if not _well_formed_re.match (i): continue
         m = email.Message.Message ()
         m['From'] = i
         wlemail.parse_message (m)
-        if is_in_list (m, 'whitelist'): continue
+        if not wl and is_in_list (m, 'whitelist'): continue
         if wleconfirm.is_mine ([i]): continue
         if not is_in_confirmed_list ([i], c):
             wlelog.log (2, 'Adding %s as authorized address' % i)

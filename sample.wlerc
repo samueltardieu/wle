@@ -20,6 +20,16 @@
 #confirmedlist = %(wledir)s/authorizedlist.txt
 
 #
+# White list
+#
+# this is a plain text file containing lines consisting of a keyword and a
+# python regular expression matching the white-listed e-mail address:
+#
+#   From user\.regex@domain-regex\.tld
+#
+#whitelist = %(wledir)s/whitelist.txt
+
+#
 # Directory for waiting mail
 #
 #queuedir = %(wledir)s/queue
@@ -126,6 +136,11 @@
 #allow_confirmer = yes
 
 #
+# Do addresses which match the whitelist get added to the authorization list?
+#
+#confirm_whitelist = no
+
+#
 # Do the recipients of my own mails get added to the authorization list?
 #
 #confirm_recipients = yes
@@ -144,7 +159,7 @@
 #
 # Log level (0 is none, 1 is errors, 9 is everything)
 #
-#loglevel = 9
+#loglevel = 0
 
 #
 # Days before a confirmation request is removed
@@ -154,7 +169,7 @@
 #
 # Auto-delete queued message if the confirmation bounces?
 #
-#auto_delete_bounce = yes
+#auto_delete_bounce = no
 
 #
 # Add sender when the magic string is part of the mail (quotes signature

@@ -30,6 +30,7 @@ _default_config = \
      'list_add_other':      'no',
      'allow_confirmer':     'yes',
      'confirm_recipients':  'yes',
+     'confirm_whitelist':   'no',
      'max_confirm':         'yes',
      'logfile':             '%(wledir)s/log',
      'loglevel':            '0',

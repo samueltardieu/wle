@@ -18,7 +18,10 @@ def waitinglist ():
     def mtime (f): return os.stat(os.path.join(queuedir, f))[stat.ST_MTIME]
     def compare(f1, f2): return cmp (mtime(f2), mtime(f1))
     l = dircache.listdir (queuedir)
-    l.sort (compare)
+    try:
+        l.sort (compare)
+    except:
+        pass
     return l
 
 #
@@ -32,7 +35,8 @@ def describe (key):
         action = 'R'
     else:
         action = 'N'
-    m = wleconfirm.open_by_key (key)
+    try: m = wleconfirm.open_by_key (key)
+    except: return ''
     t =     ' [%s] id #%s      %s (%d days)\n' % (action, key, m['date'], days)
     if m.has_key ('from'):
         t = t + '     From: %s\n' % (m['from'])
@@ -126,5 +130,9 @@ def handle_action (action, key):
     elif action == 'D':
         wleconfirm.deliver (key)
     elif action == 'R':
-        wleconfirm.move_message_from_queue (key, 'junkbox', 'Removed or expired')
-	count_junk ()
+        try:
+            wleconfirm.move_message_from_queue (key, 'junkbox',
+                                                'Removed or expired')
+        except:
+            pass
+        count_junk ()

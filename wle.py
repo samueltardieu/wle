@@ -59,10 +59,12 @@ def logic (m):
             wleconfirm.deliver_mail (m, 'junkbox')
             if wleconfig.config.getboolean ('DEFAULT', 'auto_delete_bounce'):
                 count_rejected ()
-                wleconfirm.move_message_from_queue (key,
-                                                    'junkbox',
-                                                    'Confirmation bounced')
-                wleconfirm.deliver_mail (m, 'junkbox')
+                try:
+                    wleconfirm.move_message_from_queue (key,
+                                                        'junkbox',
+                                                        'Confirmation bounced')
+                except:
+                    pass
             return
 	if wlemail.sent_to_me (m):
 	    wlemail.add_action (m, 'Mailer daemon get through')
@@ -101,6 +103,8 @@ def logic (m):
     if x:
         wlemail.add_action (m, 'White list (%s)' % x)
         handle_ok (m)
+        if wleconfig.config.getboolean ('DEFAULT', 'confirm_whitelist'):
+            wlelists.add_confirmed (m.msenders)
         return
     if wlelists.is_in_confirmed_list (m.msenders):
         wlemail.add_action (m, 'Sender found in authorized list')
